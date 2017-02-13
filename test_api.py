@@ -13,7 +13,7 @@ import json
 import sys
 
 URL = "http://192.168.33.10:8888"
-#URL = "http://dev.gobelieve.io"
+#URL = "http://api.goubuli.mobi"
 access_token = ""
 
 def LoginNumber():
