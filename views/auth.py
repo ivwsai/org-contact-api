@@ -246,8 +246,7 @@ def sync_contact():
 
     logging.debug("contacts:%s", contacts)
     logging.debug("departments:%s", depts)
-
-    logging.debug("ssss:%s", sync_key)
+    logging.debug("sync key:%s", sync_key)
     
     #如果多个联系人的时间戳和$ts相等，那么就返回和$ts相等的联系人
     #否则只返回大于$ts的联系人
