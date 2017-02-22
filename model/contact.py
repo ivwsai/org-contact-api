@@ -15,6 +15,6 @@ class Contact(object):
         """
         获取时间戳之后的部门
         """
-        sql = "SELECT dept_id, name, status, update_time FROM org_dept WHERE update_time >= %s AND org_id=%s ORDER BY update_time"
+        sql = "SELECT dept_id, name, status, parent_id, update_time FROM org_dept WHERE update_time >= %s AND org_id=%s ORDER BY update_time"
         r = db.execute(sql, (ts, org_id))
         return list(r.fetchall())
