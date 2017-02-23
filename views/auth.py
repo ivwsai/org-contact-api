@@ -148,7 +148,7 @@ def access_token():
         if c1 != c2:
             return INVALID_CODE()
 
-    orgs = User.get_org_users(g._db, zone, number)
+    orgs = User.get_orgs(g._db, zone, number)
     logging.debug("orgs:%s", orgs)
     
     access_token = random_token_generator()
@@ -203,16 +203,16 @@ def login():
     if not org_id:
         return INVALID_PARAM()
     
-    orgs = User.get_org_users(g._db, "86", request.number)
-    logging.debug("orgs:%s %s %s", request.number, orgs, org_id)
+    org_users = User.get_org_users(g._db, "86", request.number)
+    logging.debug("orgs:%s %s %s", request.number, org_users, org_id)
     
     org_uid = None
     name = ""
-    for org in orgs:
-        if org['id'] == org_id:
-            org_id = org['id']
-            org_uid = org['user_id']
-            name = org.get('name', "")
+    for u in org_users:
+        if u['org_id'] == org_id:
+            org_id = u['org_id']
+            org_uid = u['id']
+            name = u.get('name', "")
             break
 
     if not org_uid:
