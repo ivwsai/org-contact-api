@@ -23,6 +23,7 @@ MYSQL = (MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASSWD, MYSQL_DATABASE, MYSQL
 #gobelieve
 APP_ID = 1466
 APP_SECRET = 'tCj084rJXwaFfKp7vpBhJmlomBsPmZON'
+APP_NAME = "狗不理"
 
 GOBELIEVE_URL = "https://api.gobelieve.io"
 
