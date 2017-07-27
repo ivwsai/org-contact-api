@@ -231,7 +231,13 @@ def login():
     Token.set_refresh_token_uid(rds, refresh_token, org_uid, org_id)
     
     return make_response(200, resp)
-    
+
+
+@app.route("/member/organizations", methods=["GET"])
+@require_auth
+def get_organizations():
+    orgs = User.get_orgs(g._db, "86", request.number)
+    return make_response(200, {"organizations":orgs})
 
 
 @app.route("/contact/sync", methods=["GET"])
