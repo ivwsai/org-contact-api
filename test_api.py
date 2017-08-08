@@ -15,7 +15,7 @@ import sys
 URL = "http://192.168.33.10:8888"
 #URL = "http://api.goubuli.mobi"
 access_token = ""
-
+refresh_tokne = ""
 def LoginNumber():
     url = URL + "/verify_code?"
     NUMBER = "13800000000"
@@ -70,19 +70,21 @@ def LoginNumber():
     access_token = resp["access_token"]
     refresh_token = resp["refresh_token"]
 
-    return access_token    
+    return access_token, refresh_token    
 
 
 def sync_contact():
     url = URL + "/contact/sync?sync_key=0"
     headers = {}
     headers["Authorization"] = "Bearer " + access_token
+    #or
+    #headers['Refresh-Token'] = refresh_token
     headers['Content-Type'] = 'application/json'
 
     r = requests.get(url, headers=headers)
     print r.status_code, r.content    
 
-access_token = LoginNumber()
+access_token, refresh_token = LoginNumber()
 sync_contact()
 
 

@@ -19,10 +19,16 @@ def UNLOGIN():
     logging.warn("未登录到组织")
     return make_response(400, e)
 
+def INVALID_REFRESH_TOKEN():
+    e = {"error":"非法的refresh token"}
+    logging.warn("非法的refresh token")
+    return make_response(400, e)
+    
 def INVALID_ACCESS_TOKEN():
     e = {"error":"非法的access token"}
     logging.warn("非法的access token")
     return make_response(400, e)
+
 def EXPIRE_ACCESS_TOKEN():
     e = {"error":"过期的access token"}
     logging.warn("过期的access token")
@@ -60,30 +66,41 @@ def require_login(f):
     """Protect resource with specified scopes."""
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if 'Authorization' in request.headers:
+        if 'Refresh-Token' in request.headers:
+            tok = request.headers.get('Refresh-Token')
+            number, uid, org_id = Token.load_refresh_token(g.rds, tok)
+            if not number:
+                return INVALID_REFRESH_TOKEN()
+            if not uid or not org_id:
+                return UNLOGIN()
+
+            request.uid = uid
+            request.org_id = org_id
+            request.number = number
+            return f(*args, **kwargs)
+        elif 'Authorization' in request.headers:
             tok = request.headers.get('Authorization')[7:]
+            number, uid, org_id, refresh_token, expires = Token.load_access_token(g.rds, tok)
+            uid = int(uid) if uid else 0
+            org_id = int(org_id) if org_id else 0
+            expires = int(expires) if expires else 0
+            if not number:
+                return INVALID_ACCESS_TOKEN()
+            if not uid:
+                return UNLOGIN()
+             
+            if time.time() > expires:
+                logging.debug("access token expire")
+                return EXPIRE_ACCESS_TOKEN()
+             
+            request.uid = uid
+            request.org_id = org_id
+            request.number = number
+            return f(*args, **kwargs)
         else:
             return INVALID_ACCESS_TOKEN()
-
-        number, uid, org_id, refresh_token, expires = Token.load_access_token(g.rds, tok)
-        uid = int(uid) if uid else 0
-        org_id = int(org_id) if org_id else 0
-        expires = int(expires) if expires else 0
-        if not number:
-            return INVALID_ACCESS_TOKEN()
-        if not uid:
-            return UNLOGIN()
         
-        if time.time() > expires:
-            logging.debug("access token expire")
-            return EXPIRE_ACCESS_TOKEN()
-        
-        request.uid = uid
-        request.org_id = org_id
-        request.number = number
-        request.refresh_token = refresh_token
-        request.access_token = tok
-        return f(*args, **kwargs)
+     
     return wrapper
 
 
