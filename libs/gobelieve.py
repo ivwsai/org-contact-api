@@ -2,7 +2,6 @@
 import logging
 import random
 import time
-import web
 import json
 import base64
 import md5

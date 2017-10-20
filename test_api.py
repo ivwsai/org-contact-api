@@ -11,8 +11,9 @@ except ImportError:
 import threading
 import json
 import sys
+import time
 
-URL = "http://192.168.33.10:8888"
+URL = "http://192.168.33.10:15000"
 #URL = "http://api.goubuli.mobi"
 access_token = ""
 refresh_tokne = ""
@@ -84,8 +85,40 @@ def sync_contact():
     r = requests.get(url, headers=headers)
     print r.status_code, r.content    
 
+
+
+    
+#二维码登录    
+def TestQRCode():
+    url = URL + "/qrcode/session"
+    r = requests.get(url)
+    assert(r.status_code == 200)
+    obj = json.loads(r.content)
+    sid = obj["sid"]
+    print "new sid:", sid
+     
+    def scan_qrcode():
+        time.sleep(4)
+        headers = {}
+        headers["Authorization"] = "Bearer " + access_token
+        url = URL + "/qrcode/scan"
+        obj = {"sid":sid}
+        r = requests.post(url, headers=headers, data=json.dumps(obj))
+        print "scan:", r.status_code
+        return
+     
+    t = threading.Thread(target=scan_qrcode)
+    t.start()
+    
+    url = URL + "/qrcode/login?sid=%s"%sid
+    r = requests.get(url)
+    assert(r.status_code == 200)
+    print "qrcode login success:", r.content
+    
+    t.join()
+    
+    
 access_token, refresh_token = LoginNumber()
 sync_contact()
-
-
+TestQRCode()
 

@@ -21,3 +21,9 @@ class User(object):
         sql = "SELECT a.org_id as org_id, a.user_id as id, a.name as name, b.org_name as org_name FROM org_user as a, organization as b WHERE a.mobile=%s AND a.status != -1 AND a.org_id=b.org_id"
         r = db.execute(sql, number)
         return list(r.fetchall())    
+
+    @classmethod
+    def get_org_user(cls, db, uid):
+        sql = "SELECT user_id as id, name, mobile, org_name FROM org_user, organization WHERE user_id=%s AND org_user.org_id=organization.org_id"
+        r = db.execute(sql, uid)
+        return r.fetchone()

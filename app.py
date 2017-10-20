@@ -18,13 +18,16 @@ from libs.response_meta import ResponseMeta
 from libs.mysql import Mysql
 
 from views import auth
+from views import qr
+from views import contact
 
 import config
 
 app = Flask(__name__)
 app.debug = config.DEBUG
 
-rds = redis.StrictRedis(host=config.REDIS_HOST, password=config.REDIS_PASSWORD, port=config.REDIS_PORT, db=config.REDIS_DB)
+rds = redis.StrictRedis(host=config.REDIS_HOST, password=config.REDIS_PASSWORD,
+                        port=config.REDIS_PORT, db=config.REDIS_DB)
 
 
 def before_request():
@@ -83,6 +86,8 @@ def init_app(app):
     app.register_error_handler(Exception, generic_error_handler)
 
     app.register_blueprint(auth.app)
+    app.register_blueprint(qr.app)
+    app.register_blueprint(contact.app)
 
 
 random.seed()

@@ -3,12 +3,7 @@ from flask import request, Blueprint, g
 import random
 import json
 import time
-import requests
-import urllib
 import logging
-import base64
-from datetime import datetime
-from functools import wraps
 
 from model import code
 from model.token import Token
@@ -20,44 +15,14 @@ from authorization import require_auth, require_login
 from libs.util import make_response
 from libs import sms
 from libs import gobelieve
+from libs.gconnection import GConnection
+from error import *
 
 import config
 
 app = Blueprint('auth', __name__)
 
 
-def OVERFLOW():
-    e = {"error":"get verify code exceed the speed rate"}
-    logging.warn("get verify code exceed the speed rate")
-    return make_response(400, e)
-
-def INVALID_PARAM():
-    e = {"error":"非法输入"}
-    logging.warn("非法输入")
-    return make_response(400, e)
-
-def INVALID_CODE():
-    e = {"error":"验证码错误"}
-    logging.warn("验证码错误")
-    return make_response(400, e)
-
-def SMS_FAIL():
-    e = {"error":"发送短信失败"}
-    logging.warn("发送短信失败")
-    return make_response(400, e)
-    
-    
-def INVALID_REFRESH_TOKEN():
-    e = {"error":"非法的refresh token"}
-    logging.warn("非法的refresh token")
-    return make_response(400, e)
- 
-    
-def CAN_NOT_GET_TOKEN():
-    e = {"error":"获取imsdk token失败"}
-    logging.warn("获取imsdk token失败")
-    return make_response(400, e)
-   
 def create_verify_code():
     return ''.join([str(random.randint(0, 9)) for _ in range(6)])
 
@@ -239,60 +204,3 @@ def get_organizations():
     orgs = User.get_orgs(g._db, "86", request.number)
     return make_response(200, {"organizations":orgs})
 
-
-@app.route("/contact/sync", methods=["GET"])
-@require_login
-def sync_contact():
-    sync_key = request.args.get("sync_key", 0)
-    sync_key = int(sync_key)
-    org_id = request.org_id
-
-    contacts = Contact.get_contacts(g._db, org_id, sync_key)
-    depts = Contact.get_departments(g._db, org_id, sync_key)
-
-    logging.debug("contacts:%s", contacts)
-    logging.debug("departments:%s", depts)
-    logging.debug("sync key:%s", sync_key)
-    
-    #如果多个联系人的时间戳和$ts相等，那么就返回和$ts相等的联系人
-    #否则只返回大于$ts的联系人
-    count = len([c for c in contacts if c['update_time'] == sync_key])
-    if count <= 1:
-        contacts = [c for c in contacts if c['update_time'] > sync_key]
-
-    count = len([c for c in depts if c['update_time'] == sync_key])
-    if count <= 1:
-        depts = [c for c in depts if c['update_time'] > sync_key]
-
-    logging.debug("contacts:%s", contacts)
-    logging.debug("departments:%s", depts)
-
-    #找到最大的时间戳
-    for i, contact in enumerate(contacts):
-        if contact['update_time'] > sync_key:
-            sync_key = contact['update_time']
-        
-        #deleted
-        if contact['status'] == -1:
-            contacts[i] = {
-                "user_id":contact['user_id'],
-                "deleted":1
-            }
-            
-    for i, dept in enumerate(depts):
-        if dept['update_time'] > sync_key:
-            sync_key = dept['update_time']
-
-        #deleted
-        if dept['status'] == -1:
-            depts[i] = {
-                "dept_id":dept['dept_id'],
-                "deleted":1
-            }
-    
-    resp = {
-        "sync_key":sync_key,
-        "contacts":contacts,
-        "departments":depts
-    }
-    return make_response(200, resp)
