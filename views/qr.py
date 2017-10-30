@@ -176,7 +176,10 @@ def login():
 @app.route("/qrcode/<id>")
 def get_qrcode_image(id):
     logging.debug("qrcode id:%s", id)
-    img = qrcode.make(id)
+    qr = qrcode.QRCode(version=2, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=1)
+    qr.add_data(id)
+    qr.make(fit=True)
+    img = qr.make_image()
     output = StringIO.StringIO()
     img.save(output)
     return output.getvalue()    
