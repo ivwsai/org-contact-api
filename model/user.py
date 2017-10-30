@@ -27,3 +27,9 @@ class User(object):
         sql = "SELECT user_id as id, name, mobile, org_name FROM org_user, organization WHERE user_id=%s AND org_user.org_id=organization.org_id"
         r = db.execute(sql, uid)
         return r.fetchone()
+
+    @classmethod
+    def set_avatar(cls, db, uid, url, origin_url):
+        sql = "UPDATE org_user SET avatar=%s, avatar_origin=%s WHERE user_id=%s"
+        r = db.execute(sql, (url, origin_url, uid))
+        return r.rowcount        

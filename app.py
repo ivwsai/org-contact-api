@@ -20,6 +20,7 @@ from libs.mysql import Mysql
 from views import auth
 from views import qr
 from views import contact
+from views import avatar
 
 import config
 
@@ -88,6 +89,7 @@ def init_app(app):
     app.register_blueprint(auth.app)
     app.register_blueprint(qr.app)
     app.register_blueprint(contact.app)
+    app.register_blueprint(avatar.app)
 
 
 random.seed()

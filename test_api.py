@@ -13,7 +13,7 @@ import json
 import sys
 import time
 
-URL = "http://192.168.33.10:15000"
+URL = "http://192.168.33.10:8888"
 #URL = "http://api.goubuli.mobi"
 access_token = ""
 refresh_tokne = ""
@@ -87,6 +87,15 @@ def sync_contact():
 
 
 
+#表单上传图片
+def TestAvatar():
+    url = URL + "/avatars"
+    files = {'file': ('test.jpg', open('data/test.jpg', 'rb'), "image/jpeg")}
+    headers = {}
+    headers["Authorization"] = "Bearer " + access_token
+    r = requests.post(url, headers=headers, files=files)
+    print r.status_code, r.content
+    
     
 #二维码登录    
 def TestQRCode():
@@ -119,6 +128,7 @@ def TestQRCode():
     
     
 access_token, refresh_token = LoginNumber()
-sync_contact()
-TestQRCode()
+TestAvatar()
+#sync_contact()
+#TestQRCode()
 
