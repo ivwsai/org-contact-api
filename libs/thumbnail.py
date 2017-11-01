@@ -1,7 +1,6 @@
 import os
 from StringIO import StringIO
 from PIL import Image
-from fs import FS
 
 def parse_param(p):
     width = 0
