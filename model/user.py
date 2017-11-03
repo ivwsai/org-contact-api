@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
-        
+import time
+
 class User(object):
     @classmethod
     def get_orgs(cls, db, zone, number):
@@ -30,6 +31,7 @@ class User(object):
 
     @classmethod
     def set_avatar(cls, db, uid, url, origin_url):
-        sql = "UPDATE org_user SET avatar=%s, origin_avatar=%s WHERE user_id=%s"
-        r = db.execute(sql, (url, origin_url, uid))
+        now = int(time.time()*1000)
+        sql = "UPDATE org_user SET avatar=%s, origin_avatar=%s, update_time=%s WHERE user_id=%s"
+        r = db.execute(sql, (url, origin_url, now, uid))
         return r.rowcount        
