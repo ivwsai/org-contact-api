@@ -18,7 +18,7 @@ class User(object):
         获取手机号码所在的组织列表
 
         """
-        sql = "SELECT a.org_id as org_id, a.user_id as id, a.name as name, b.org_name as org_name FROM org_user as a, organization as b WHERE a.mobile=%s AND a.status != -1 AND a.org_id=b.org_id"
+        sql = "SELECT a.org_id as org_id, a.user_id as id, a.name as name, a.avatar as avatar, a.origin_avatar as origin_avatar, b.org_name as org_name FROM org_user as a, organization as b WHERE a.mobile=%s AND a.status != -1 AND a.org_id=b.org_id"
         r = db.execute(sql, number)
         return list(r.fetchall())    
 
@@ -30,6 +30,6 @@ class User(object):
 
     @classmethod
     def set_avatar(cls, db, uid, url, origin_url):
-        sql = "UPDATE org_user SET avatar=%s, avatar_origin=%s WHERE user_id=%s"
+        sql = "UPDATE org_user SET avatar=%s, origin_avatar=%s WHERE user_id=%s"
         r = db.execute(sql, (url, origin_url, uid))
         return r.rowcount        
