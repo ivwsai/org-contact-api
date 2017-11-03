@@ -173,11 +173,15 @@ def login():
     
     org_uid = None
     name = ""
+    avatar = ""
+    origin_avatar = ""
     for u in org_users:
         if u['org_id'] == org_id:
             org_id = u['org_id']
             org_uid = u['id']
             name = u.get('name', "")
+            avatar = u.get("avatar", "")
+            origin_avatar = u.get("origin_avatar", "")
             break
 
     if not org_uid:
@@ -187,6 +191,8 @@ def login():
     resp = {
         "gobelieve_token":token,
         "username":name,
+        "avatar":avatar,
+        "origin_avatar":origin_avatar,
         "id":org_uid
     }
 
